@@ -1,17 +1,35 @@
-import React from 'react'
-import {  FlatList, View } from 'react-native'
-import users from '../data/user'
+import React, { useContext } from 'react'
+import { FlatList, View, Alert } from 'react-native'
 import { ListItem, Avatar, Button, Icon } from 'react-native-elements'
+import UsersContext from '../context/UsersContext'
 
 export default props => {
 
+    const {state} = useContext(UsersContext)
+   
     function confirmUserDeletion(user) {
-        console.warn('Confirmação: usuário ' + user.name + ' seria excluído.')
+        setTimeout(() => {
+            Alert.alert(
+            'Excluir Usuário',
+            `Deseja excluir o usuário ${user.name}?`,
+            [
+                {
+                    text: 'Sim',
+                    onPress: () => {
+                        console.warn(`Usuário ${user.name} excluído!`);
+                    },
+                },
+                {
+                    text: 'Não',
+                    style: 'cancel',
+                },
+            ],
+            { cancelable: false }
+            );
+        }, 0);
     }
 
-
     function getActions(user){
-        console.log('getActions chamado para:', user.name);
         return (
             <>
                 <Button 
@@ -20,7 +38,7 @@ export default props => {
                     icon={<Icon name="edit" size={25} color="orange"/>}
                 />
                 <Button 
-                    onPress={() =>confirmUserDeletion(user)}
+                    onPress={() => confirmUserDeletion(user)}
                     type="clear"
                     icon={<Icon name="delete" size={25} color="red"/>}
                 />
@@ -29,14 +47,10 @@ export default props => {
     }
 
     function getUserItem({ item: user }) {
-        console.log("Renderizando usuário:", user.id)
         return (
-            <ListItem
-                bottomDivider 
-                onPress={() => props.navigation.navigate('UserForm', user)}
-            >
+            <ListItem bottomDivider>
                 <Avatar source={{ uri: user.avatarUrl }} rounded />
-                <ListItem.Content >
+                <ListItem.Content>
                     <ListItem.Title>{user.name}</ListItem.Title>
                     <ListItem.Subtitle>{user.email}</ListItem.Subtitle>
                 </ListItem.Content>
@@ -49,7 +63,7 @@ export default props => {
         <View style={{ flex: 1 }} >
             <FlatList
                 keyExtractor={user => user.id.toString()}
-                data={users}
+                data={state.user}
                 renderItem={getUserItem}
             />
         </View>
